@@ -4,7 +4,9 @@ import { GraduationCap, Zap } from 'lucide-react';
 import SearchBar from './components/SearchBar';
 import LoadingLesson from './components/LoadingLesson';
 import LessonPage from './pages/LessonPage';
+import HistorySidebar from './components/HistorySidebar';
 import { useLesson } from './hooks/useLesson';
+import { useHistory } from './hooks/useHistory';
 
 function HeroSection() {
   return (
@@ -54,11 +56,17 @@ function HeroSection() {
 
 export default function App() {
   const { lesson, webResults, loading, error, fetchLesson } = useLesson();
+  const { history, addEntry, removeEntry, clearHistory } = useHistory();
   const [currentTopic, setCurrentTopic] = useState('');
 
-  const handleSearch = (topic) => {
+  const handleSearch = async (topic) => {
     setCurrentTopic(topic);
-    fetchLesson(topic);
+    const data = await fetchLesson(topic);
+    if (data?.lesson) addEntry(topic, data.lesson);
+  };
+
+  const handleHistorySelect = (topic) => {
+    handleSearch(topic);
   };
 
   return (
@@ -121,6 +129,14 @@ export default function App() {
           )}
         </AnimatePresence>
       </div>
+
+      <HistorySidebar
+        history={history}
+        onSelect={handleHistorySelect}
+        onRemove={removeEntry}
+        onClear={clearHistory}
+        currentTopic={currentTopic}
+      />
     </div>
   );
 }

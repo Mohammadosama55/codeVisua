@@ -16,8 +16,10 @@ export function useLesson() {
       const data = await generateLesson(topic);
       setLesson(data.lesson);
       setWebResults(data.webResults);
+      return data;
     } catch (err) {
       setError(err.response?.data?.error || err.message || 'Failed to generate lesson');
+      return null;
     } finally {
       setLoading(false);
     }
