@@ -1,122 +1,126 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { GraduationCap, Zap } from 'lucide-react';
+import SearchBar from './components/SearchBar';
+import LoadingLesson from './components/LoadingLesson';
+import LessonPage from './pages/LessonPage';
+import { useLesson } from './hooks/useLesson';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function HeroSection() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div className="text-center space-y-4 py-8">
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+        className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600 to-blue-600 shadow-2xl shadow-violet-900/50 mx-auto"
+      >
+        <GraduationCap className="w-10 h-10 text-white" />
+      </motion.div>
+      <motion.h1
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="text-4xl sm:text-5xl font-extrabold text-white"
+      >
+        DSA<span className="text-violet-400">Learn</span>
+      </motion.h1>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="text-gray-400 text-lg max-w-xl mx-auto"
+      >
+        Search any Data Structure or Algorithm — get an AI-generated lesson with
+        <span className="text-violet-300"> animated visualization</span>,
+        <span className="text-blue-300"> multi-language code</span>, and
+        <span className="text-green-300"> live web context</span>.
+      </motion.p>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="flex items-center justify-center gap-4 text-xs text-gray-500 flex-wrap"
+      >
+        <span className="flex items-center gap-1"><Zap className="w-3 h-3 text-yellow-400" /> Powered by Groq + Llama 3</span>
+        <span className="text-gray-700">•</span>
+        <span className="flex items-center gap-1">🌐 Tavily web search</span>
+        <span className="text-gray-700">•</span>
+        <span className="flex items-center gap-1">💯 100% Free</span>
+      </motion.div>
+    </div>
+  );
 }
 
-export default App
+export default function App() {
+  const { lesson, webResults, loading, error, fetchLesson } = useLesson();
+  const [currentTopic, setCurrentTopic] = useState('');
+
+  const handleSearch = (topic) => {
+    setCurrentTopic(topic);
+    fetchLesson(topic);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-950 text-white">
+      <div className="max-w-4xl mx-auto px-4 pb-16">
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-between py-5 border-b border-gray-800 mb-8"
+        >
+          <div className="flex items-center gap-2">
+            <GraduationCap className="w-6 h-6 text-violet-400" />
+            <span className="font-bold text-white">DSALearn</span>
+          </div>
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-950 border border-green-800 text-green-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              AI Online
+            </span>
+          </div>
+        </motion.header>
+
+        <AnimatePresence mode="wait">
+          {!lesson && !loading && (
+            <motion.div key="hero" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <HeroSection />
+              <div className="mt-8">
+                <SearchBar onSearch={handleSearch} loading={loading} />
+              </div>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 p-4 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-sm text-center"
+                >
+                  {error}
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+
+          {loading && (
+            <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <LoadingLesson topic={currentTopic} />
+            </motion.div>
+          )}
+
+          {lesson && !loading && (
+            <motion.div key="lesson" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <div className="mb-6">
+                <SearchBar onSearch={handleSearch} loading={loading} />
+              </div>
+              {error && (
+                <div className="mb-4 p-4 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-sm text-center">
+                  {error}
+                </div>
+              )}
+              <LessonPage lesson={lesson} webResults={webResults} topic={currentTopic} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
