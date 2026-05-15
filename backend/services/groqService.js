@@ -19,11 +19,12 @@ When explaining a concept, structure your response as valid JSON with this exact
         "stepId": 1,
         "title": "Step title",
         "description": "What is happening in this step (explain visually)",
-        "highlight": "which element/node/index is active",
-        "state": "current state description"
+        "highlight": "which element/node/index is active (use the value or index)",
+        "state": "current state description e.g. 'Comparing index 2 and 3'",
+        "data": [the CURRENT snapshot of the data structure at this step, e.g. partially sorted array or current tree nodes]
       }
     ],
-    "initialData": [any initial data structure values, e.g. array of numbers or node values]
+    "initialData": [the starting data structure values before any steps]
   },
   "concept": {
     "keyIdeas": ["idea1", "idea2", "idea3"],

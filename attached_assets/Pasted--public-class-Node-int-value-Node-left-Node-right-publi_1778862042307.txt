@@ -1,0 +1,107 @@
+
+public class Node {
+  int value;
+  Node left;
+  Node right;
+
+  public Node(int value) {
+    this.value = value;
+    this.left = null;
+    this.right = null;
+  }
+}
+
+public class BinarySearchTree {
+  private Node root;
+
+  public BinarySearchTree() {
+    this.root = null;
+  }
+
+  public void insert(int value) {
+    if (root == null) {
+      root = new Node(value);
+    } else {
+      _insert(root, value);
+    }
+  }
+
+  private void _insert(Node node, int value) {
+    if (value < node.value) {
+      if (node.left == null) {
+        node.left = new Node(value);
+      } else {
+        _insert(node.left, value);
+      }
+    } else {
+      if (node.right == null) {
+        node.right = new Node(value);
+      } else {
+        _insert(node.right, value);
+      }
+    }
+  }
+
+  public boolean search(int value) {
+    return _search(root, value);
+  }
+
+  private boolean _search(Node node, int value) {
+    if (node == null) {
+      return false;
+    }
+    if (value == node.value) {
+      return true;
+    } else if (value < node.value) {
+      return _search(node.left, value);
+    } else {
+      return _search(node.right, value);
+    }
+  }
+
+  public void deleteValue(int value) {
+    root = _delete(root, value);
+  }
+
+  private Node _delete(Node node, int value) {
+    if (node == null) {
+      return node;
+    }
+    if (value < node.value) {
+      node.left = _delete(node.left, value);
+    } else if (value > node.value) {
+      node.right = _delete(node.right, value);
+    } else {
+      if (node.left == null) {
+        return node.right;
+      } else if (node.right == null) {
+        return node.left;
+      } else {
+        Node temp = _findMin(node.right);
+        node.value = temp.value;
+        node.right = _delete(node.right, temp.value);
+      }
+    }
+    return node;
+  }
+
+  private Node _findMin(Node node) {
+    Node current = node;
+    while (current.left != null) {
+      current = current.left;
+    }
+    return current;
+  }
+
+  public static void main(String[] args) {
+    BinarySearchTree bst = new BinarySearchTree();
+    bst.insert(5);
+    bst.insert(3);
+    bst.insert(7);
+    System.out.println(bst.search(3));  // true
+    System.out.println(bst.search(6));  // false
+    bst.deleteValue(3);
+    System.out.println(bst.search(3));  // false
+  }
+}
+      
