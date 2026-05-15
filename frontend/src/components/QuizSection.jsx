@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, HelpCircle, Trophy } from 'lucide-react';
 
-export default function QuizSection({ quiz, topic }) {
+export default function QuizSection({ quiz, topic, onComplete }) {
   const [answers, setAnswers] = useState({});
   const [revealed, setRevealed] = useState({});
   const [done, setDone] = useState(false);
@@ -17,8 +17,16 @@ export default function QuizSection({ quiz, topic }) {
 
   const score = quiz.filter((q, i) => answers[i] === q.correct).length;
 
-  const handleFinish = () => setDone(true);
-  const handleRetry = () => { setAnswers({}); setRevealed({}); setDone(false); };
+  const handleFinish = () => {
+    setDone(true);
+    if (onComplete) onComplete(score, quiz.length);
+  };
+
+  const handleRetry = () => {
+    setAnswers({});
+    setRevealed({});
+    setDone(false);
+  };
 
   return (
     <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
@@ -57,10 +65,10 @@ export default function QuizSection({ quiz, topic }) {
                   <div className="grid grid-cols-1 gap-2">
                     {q.options.map((opt, oi) => {
                       const isSelected = answers[qi] === oi;
-                      const isCorrect = oi === q.correct;
+                      const isCorrect  = oi === q.correct;
                       const isRevealedQ = revealed[qi];
                       let cls = 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-750 hover:border-gray-600';
-                      if (isRevealedQ && isCorrect) cls = 'bg-green-950 border-green-700 text-green-300';
+                      if (isRevealedQ && isCorrect)              cls = 'bg-green-950 border-green-700 text-green-300';
                       else if (isRevealedQ && isSelected && !isCorrect) cls = 'bg-red-950 border-red-700 text-red-300';
                       return (
                         <button
@@ -69,8 +77,8 @@ export default function QuizSection({ quiz, topic }) {
                           disabled={isRevealedQ}
                           className={`flex items-center gap-3 px-4 py-2.5 rounded-xl border text-left text-sm transition-all ${cls} disabled:cursor-default`}
                         >
-                          {isRevealedQ && isCorrect && <CheckCircle className="w-4 h-4 shrink-0" />}
-                          {isRevealedQ && isSelected && !isCorrect && <XCircle className="w-4 h-4 shrink-0" />}
+                          {isRevealedQ && isCorrect              && <CheckCircle className="w-4 h-4 shrink-0" />}
+                          {isRevealedQ && isSelected && !isCorrect && <XCircle    className="w-4 h-4 shrink-0" />}
                           {(!isRevealedQ || (!isCorrect && !isSelected)) && (
                             <span className="w-5 h-5 shrink-0 rounded-full border border-current flex items-center justify-center text-xs">
                               {String.fromCharCode(65 + oi)}

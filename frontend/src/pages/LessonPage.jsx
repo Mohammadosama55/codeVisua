@@ -9,12 +9,12 @@ import QuizSection from '../components/QuizSection';
 
 const TABS = [
   { id: 'animation', label: 'Animation', icon: BookOpen },
-  { id: 'code', label: 'Code', icon: Code2 },
-  { id: 'web', label: 'Web Context', icon: Globe },
-  { id: 'quiz', label: 'Quiz', icon: HelpCircle },
+  { id: 'code',      label: 'Code',      icon: Code2    },
+  { id: 'web',       label: 'Web',       icon: Globe    },
+  { id: 'quiz',      label: 'Quiz',      icon: HelpCircle },
 ];
 
-export default function LessonPage({ lesson, webResults, topic }) {
+export default function LessonPage({ lesson, webResults, topic, onQuizComplete }) {
   const [activeTab, setActiveTab] = useState('animation');
 
   return (
@@ -75,8 +75,14 @@ export default function LessonPage({ lesson, webResults, topic }) {
             </div>
           )}
           {activeTab === 'code' && <CodeViewer codeExplanation={lesson.codeExplanation} />}
-          {activeTab === 'web' && <WebResults webResults={webResults} />}
-          {activeTab === 'quiz' && <QuizSection quiz={lesson.quiz} topic={topic} />}
+          {activeTab === 'web'  && <WebResults webResults={webResults} />}
+          {activeTab === 'quiz' && (
+            <QuizSection
+              quiz={lesson.quiz}
+              topic={topic}
+              onComplete={onQuizComplete}
+            />
+          )}
         </motion.div>
       </AnimatePresence>
     </motion.div>

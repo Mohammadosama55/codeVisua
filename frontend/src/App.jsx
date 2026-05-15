@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GraduationCap, Zap, Map } from 'lucide-react';
 import SearchBar from './components/SearchBar';
@@ -6,10 +6,12 @@ import LoadingLesson from './components/LoadingLesson';
 import LessonPage from './pages/LessonPage';
 import HistorySidebar from './components/HistorySidebar';
 import RoadmapView from './components/RoadmapView';
+import StreakBadge from './components/StreakBadge';
+import XPToast from './components/XPToast';
 import { useLesson } from './hooks/useLesson';
 import { useHistory } from './hooks/useHistory';
+import { useStreak } from './hooks/useStreak';
 import { getNextSuggestions, matchHistoryToTopics } from './data/roadmap';
-import { useMemo } from 'react';
 
 function HeroSection({ history, onSearch }) {
   const completedIds = useMemo(() => matchHistoryToTopics(history), [history]);
@@ -60,7 +62,6 @@ function HeroSection({ history, onSearch }) {
         <span className="flex items-center gap-1">💯 100% Free</span>
       </motion.div>
 
-      {/* Roadmap suggestions on homepage */}
       {suggestions.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -91,15 +92,19 @@ function HeroSection({ history, onSearch }) {
 
 export default function App() {
   const { lesson, webResults, loading, error, fetchLesson } = useLesson();
-  const { history, addEntry, removeEntry, clearHistory } = useHistory();
-  const [currentTopic, setCurrentTopic]   = useState('');
-  const [showRoadmap, setShowRoadmap]     = useState(false);
+  const { history, addEntry, removeEntry, clearHistory }    = useHistory();
+  const { data: streakData, toast, recordLesson, recordQuizScore } = useStreak();
+  const [currentTopic, setCurrentTopic] = useState('');
+  const [showRoadmap,  setShowRoadmap]  = useState(false);
 
   const handleSearch = async (topic) => {
     setShowRoadmap(false);
     setCurrentTopic(topic);
     const data = await fetchLesson(topic);
-    if (data?.lesson) addEntry(topic, data.lesson);
+    if (data?.lesson) {
+      addEntry(topic, data.lesson);
+      recordLesson(topic);
+    }
   };
 
   const completedIds = useMemo(() => matchHistoryToTopics(history), [history]);
@@ -117,7 +122,7 @@ export default function App() {
           className="flex items-center justify-between py-5 border-b border-gray-800 mb-8"
         >
           <button
-            onClick={() => { setShowRoadmap(false); }}
+            onClick={() => setShowRoadmap(false)}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <GraduationCap className="w-6 h-6 text-violet-400" />
@@ -125,6 +130,9 @@ export default function App() {
           </button>
 
           <div className="flex items-center gap-2">
+            {/* Streak & XP badge */}
+            <StreakBadge data={streakData} />
+
             {/* Roadmap progress pill */}
             <button
               onClick={() => setShowRoadmap(true)}
@@ -140,7 +148,6 @@ export default function App() {
               </div>
             </button>
 
-            {/* Mobile roadmap button */}
             <button
               onClick={() => setShowRoadmap(true)}
               className="sm:hidden p-2 rounded-xl bg-gray-900 border border-gray-700 text-violet-400"
@@ -191,11 +198,19 @@ export default function App() {
                   {error}
                 </div>
               )}
-              <LessonPage lesson={lesson} webResults={webResults} topic={currentTopic} />
+              <LessonPage
+                lesson={lesson}
+                webResults={webResults}
+                topic={currentTopic}
+                onQuizComplete={recordQuizScore}
+              />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* Floating XP toast */}
+      <XPToast toast={toast} />
 
       {/* History sidebar */}
       <HistorySidebar
