@@ -52,12 +52,34 @@ When explaining a concept, structure your response as valid JSON with this exact
       ]
     }
   },
+  "deepDive": {
+    "hook": "1-2 sentence attention-grabbing opener like a YouTuber would say (e.g. 'Ever wondered how Google Maps finds the shortest path in milliseconds?')",
+    "definition": "Crystal-clear, beginner-friendly definition in 2-3 sentences. No jargon.",
+    "analogy": "A vivid real-world analogy that makes the concept click instantly (e.g. comparing a stack to a stack of plates)",
+    "example": "Walk through ONE concrete example step by step with specific values — show inputs, process, and output. Make it feel like a tutor working through it on a whiteboard.",
+    "logicSteps": [
+      "Step 1: describe exactly what the algorithm does at this point",
+      "Step 2: next logical step with explanation of WHY",
+      "Step 3: continue until the concept is fully explained"
+    ],
+    "internalExecution": [
+      "Line 1-2: describe what these lines do in memory/execution",
+      "Line 3-4: what variables are created, what values they hold",
+      "Function call: what goes on the call stack",
+      "Return: what gets returned and why"
+    ],
+    "commonMistakes": [
+      "Mistake 1 and how to avoid it",
+      "Mistake 2 beginners often make",
+      "Mistake 3 edge case often forgotten"
+    ]
+  },
   "quiz": [
     { "question": "question text", "options": ["A", "B", "C", "D"], "correct": 0, "explanation": "why this is correct" }
   ]
 }
 
-Be thorough, accurate, and make it feel like a premium lesson. All code must be complete and runnable.`;
+Be thorough, accurate, and make it feel like a premium lesson. All code must be complete and runnable. The deepDive section must feel like an engaging YouTube tutorial — conversational, example-driven, and crystal clear.`;
 
 export async function generateLesson(topic) {
   const completion = await groq.chat.completions.create({
@@ -108,6 +130,34 @@ export async function generateHint(topic, question) {
     ],
     temperature: 0.5,
     max_tokens: 200,
+  });
+  return completion.choices[0].message.content.trim();
+}
+
+export async function askQuestion(topic, question, history = [], context = '') {
+  const systemPrompt = `You are an expert CS tutor specializing in Data Structures & Algorithms. 
+The student is currently learning about: "${topic}".
+${context ? `Lesson context: ${context}` : ''}
+
+Your style:
+- Explain like a great YouTuber: engaging, clear, example-driven
+- Use analogies and concrete examples
+- Keep answers focused and concise (3-6 sentences unless a longer explanation is genuinely needed)
+- If the student is confused, try a completely different angle or analogy
+- Use numbered steps when explaining a process
+- Always tie back to the current topic: ${topic}`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    ...history.map(m => ({ role: m.role, content: m.content })),
+    { role: 'user', content: question },
+  ];
+
+  const completion = await groq.chat.completions.create({
+    model: 'llama-3.3-70b-versatile',
+    messages,
+    temperature: 0.7,
+    max_tokens: 600,
   });
   return completion.choices[0].message.content.trim();
 }

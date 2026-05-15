@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { generateLesson, generateHint } from '../services/groqService.js';
+import { generateLesson, generateHint, askQuestion } from '../services/groqService.js';
 import { searchWeb } from '../services/tavilyService.js';
 
 const router = Router();
@@ -30,6 +30,18 @@ router.post('/hint', async (req, res) => {
     res.json({ hint });
   } catch (err) {
     res.status(500).json({ error: 'Failed to get hint' });
+  }
+});
+
+router.post('/ask', async (req, res) => {
+  try {
+    const { topic, question, history, context } = req.body;
+    if (!topic || !question) return res.status(400).json({ error: 'topic and question required' });
+    const answer = await askQuestion(topic, question, history || [], context || '');
+    res.json({ answer });
+  } catch (err) {
+    console.error('Ask error:', err);
+    res.status(500).json({ error: 'Failed to get answer' });
   }
 });
 
