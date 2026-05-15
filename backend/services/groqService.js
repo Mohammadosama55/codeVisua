@@ -72,7 +72,30 @@ export async function generateLesson(topic) {
   const raw = completion.choices[0].message.content.trim();
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error('Failed to parse lesson JSON from LLM');
-  return JSON.parse(jsonMatch[0]);
+
+  // Escape literal control characters that appear inside JSON string values.
+  // The LLM often puts real newlines/tabs inside "code" strings, making JSON.parse throw.
+  const sanitized = jsonMatch[0].replace(
+    /"((?:[^"\\]|\\[\s\S])*)"/g,
+    (_, inner) =>
+      '"' +
+      inner
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r')
+        .replace(/\t/g, '\\t')
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '') +
+      '"'
+  );
+
+  try {
+    return JSON.parse(sanitized);
+  } catch (e) {
+    // Last-resort: strip every bare control character and retry
+    const stripped = sanitized.replace(/[\x00-\x1F\x7F]/g, m =>
+      m === '\n' || m === '\r' || m === '\t' ? m : ''
+    );
+    return JSON.parse(stripped);
+  }
 }
 
 export async function generateHint(topic, question) {
