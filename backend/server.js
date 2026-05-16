@@ -9,6 +9,7 @@ import pg from 'pg';
 import learnRouter from './routes/learn.js';
 import searchRouter from './routes/search.js';
 import authRouter from './routes/auth.js';
+import userdataRouter from './routes/userdata.js';
 
 dotenv.config();
 
@@ -43,9 +44,10 @@ app.use(session({
 }));
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
-app.use('/api/auth',   authRouter);
-app.use('/api/learn',  learnRouter);
-app.use('/api/search', searchRouter);
+app.use('/api/auth',     authRouter);
+app.use('/api/userdata', userdataRouter);
+app.use('/api/learn',    learnRouter);
+app.use('/api/search',   searchRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
