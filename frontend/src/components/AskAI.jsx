@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, Send, X, Bot, User, Sparkles, RotateCcw } from 'lucide-react';
+import { Send, X, Bot, User, Brain, RotateCcw } from 'lucide-react';
 
 const STARTERS = [
   'Can you give me a simpler analogy?',
@@ -104,7 +104,7 @@ export default function AskAI({ topic, lessonContext }) {
         whileTap={{ scale: 0.95 }}
         className="fixed bottom-24 right-5 z-40 flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-br from-violet-600 to-blue-600 text-white font-semibold shadow-2xl shadow-violet-900/60"
       >
-        <Sparkles className="w-4 h-4" />
+        <Brain className="w-4 h-4" />
         <span className="text-sm">Ask AI</span>
         {messages.length > 0 && (
           <span className="w-5 h-5 rounded-full bg-white text-violet-700 text-[10px] font-bold flex items-center justify-center">
@@ -132,8 +132,8 @@ export default function AskAI({ topic, lessonContext }) {
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-gray-900/80 backdrop-blur shrink-0">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center shadow-md shadow-violet-900/40">
+                    <Brain className="w-4 h-4 text-white" />
                   </div>
                   <div>
                     <p className="text-white text-sm font-bold">Ask AI Tutor</p>
@@ -157,8 +157,8 @@ export default function AskAI({ topic, lessonContext }) {
                 {messages.length === 0 && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                     <div className="text-center pt-4">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-700 to-blue-700 flex items-center justify-center mx-auto mb-3">
-                        <Bot className="w-6 h-6 text-white" />
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-700 to-blue-700 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-violet-900/40">
+                        <Brain className="w-6 h-6 text-white" />
                       </div>
                       <p className="text-white font-semibold text-sm">Hi! I'm your AI tutor 👋</p>
                       <p className="text-gray-500 text-xs mt-1">Ask me anything about <span className="text-violet-400 font-semibold">{topic}</span></p>

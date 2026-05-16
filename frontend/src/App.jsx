@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, Zap, Map } from 'lucide-react';
+import { GraduationCap, Zap, Map, LogIn, LogOut, User } from 'lucide-react';
 import SearchBar from './components/SearchBar';
 import LoadingLesson from './components/LoadingLesson';
 import LessonPage from './pages/LessonPage';
@@ -8,9 +8,11 @@ import HistorySidebar from './components/HistorySidebar';
 import RoadmapView from './components/RoadmapView';
 import StreakBadge from './components/StreakBadge';
 import XPToast from './components/XPToast';
+import AuthModal from './components/AuthModal';
 import { useLesson } from './hooks/useLesson';
 import { useHistory } from './hooks/useHistory';
 import { useStreak } from './hooks/useStreak';
+import { useAuth } from './hooks/useAuth.jsx';
 import { getNextSuggestions, matchHistoryToTopics } from './data/roadmap';
 
 function HeroSection({ history, onSearch }) {
@@ -94,8 +96,10 @@ export default function App() {
   const { lesson, webResults, loading, error, cacheInfo, fetchLesson } = useLesson();
   const { history, addEntry, removeEntry, clearHistory }               = useHistory();
   const { data: streakData, toast, recordLesson, recordQuizScore }     = useStreak();
+  const { user, logout }                                               = useAuth();
   const [currentTopic, setCurrentTopic] = useState('');
   const [showRoadmap,  setShowRoadmap]  = useState(false);
+  const [showAuth,     setShowAuth]     = useState(false);
 
   const handleSearch = async (topic, forceRefresh = false) => {
     setShowRoadmap(false);
@@ -155,6 +159,36 @@ export default function App() {
               <Map className="w-4 h-4" />
             </button>
 
+            {/* Auth button */}
+            {user ? (
+              <div className="flex items-center gap-1.5">
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-900 border border-gray-700">
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center">
+                    <User className="w-3 h-3 text-white" />
+                  </div>
+                  <span className="text-xs text-gray-300 font-medium max-w-[90px] truncate">
+                    {user.display_name || user.username}
+                  </span>
+                </div>
+                <button
+                  onClick={logout}
+                  title="Sign out"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-900 border border-gray-700 text-gray-400 hover:text-red-400 hover:border-red-800 hover:bg-red-950/30 transition-all text-xs"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Sign out</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowAuth(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold transition-all shadow shadow-violet-900/40"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign in</span>
+              </button>
+            )}
+
             <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-950 border border-green-800 text-green-400 text-xs">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
               AI Online
@@ -212,6 +246,11 @@ export default function App() {
       </div>
 
       <XPToast toast={toast} />
+
+      {/* Auth modal */}
+      <AnimatePresence>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      </AnimatePresence>
 
       <HistorySidebar
         history={history}
