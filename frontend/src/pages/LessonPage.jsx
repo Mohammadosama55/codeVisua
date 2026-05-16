@@ -10,7 +10,7 @@ import DeepDiveSection from '../components/DeepDiveSection';
 import AskAI from '../components/AskAI';
 import { useNotes } from '../hooks/useNotes';
 
-export default function LessonPage({ lesson, webResults, topic, onQuizComplete }) {
+export default function LessonPage({ lesson, webResults, topic, cacheInfo, onRefresh, onQuizComplete }) {
   const [activeTab, setActiveTab] = useState('animation');
   const { getNote, setNote, noteCount } = useNotes(topic);
 
@@ -38,7 +38,7 @@ export default function LessonPage({ lesson, webResults, topic, onQuizComplete }
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-4xl mx-auto space-y-5"
     >
-      <ConceptCard concept={lesson.concept} lesson={lesson} />
+      <ConceptCard concept={lesson.concept} lesson={lesson} cacheInfo={cacheInfo} onRefresh={onRefresh} />
 
       {/* Tab bar */}
       <div className="flex items-center gap-1 bg-gray-900 border border-gray-800 rounded-2xl p-1.5 overflow-x-auto scrollbar-none">

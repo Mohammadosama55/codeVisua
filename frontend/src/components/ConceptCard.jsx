@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { Clock, Zap, Database, Target } from 'lucide-react';
+import { Clock, Zap, Database, Target, RefreshCw, Layers } from 'lucide-react';
 
-export default function ConceptCard({ concept, lesson }) {
+export default function ConceptCard({ concept, lesson, cacheInfo, onRefresh }) {
   if (!concept || !lesson) return null;
   const { keyIdeas, timeComplexity, spaceComplexity, useCases } = concept;
 
@@ -25,6 +25,24 @@ export default function ConceptCard({ concept, lesson }) {
           <span className="text-xs text-gray-500 flex items-center gap-1 bg-gray-800 px-3 py-1 rounded-full border border-gray-700">
             <Clock className="w-3 h-3" /> ~{lesson.timeToLearn} min
           </span>
+          {cacheInfo?.lessonFromCache ? (
+            <span className="text-xs flex items-center gap-1 bg-blue-950/60 text-blue-400 px-3 py-1 rounded-full border border-blue-800">
+              <Layers className="w-3 h-3" /> Cached
+            </span>
+          ) : (
+            <span className="text-xs flex items-center gap-1 bg-green-950/60 text-green-400 px-3 py-1 rounded-full border border-green-800">
+              <Zap className="w-3 h-3" /> Fresh
+            </span>
+          )}
+          {cacheInfo?.lessonFromCache && onRefresh && (
+            <button
+              onClick={onRefresh}
+              title="Regenerate fresh lesson"
+              className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-gray-800 border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-all"
+            >
+              <RefreshCw className="w-3 h-3" /> Regenerate
+            </button>
+          )}
         </div>
       </div>
 

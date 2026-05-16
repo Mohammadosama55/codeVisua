@@ -91,21 +91,23 @@ function HeroSection({ history, onSearch }) {
 }
 
 export default function App() {
-  const { lesson, webResults, loading, error, fetchLesson } = useLesson();
-  const { history, addEntry, removeEntry, clearHistory }    = useHistory();
-  const { data: streakData, toast, recordLesson, recordQuizScore } = useStreak();
+  const { lesson, webResults, loading, error, cacheInfo, fetchLesson } = useLesson();
+  const { history, addEntry, removeEntry, clearHistory }               = useHistory();
+  const { data: streakData, toast, recordLesson, recordQuizScore }     = useStreak();
   const [currentTopic, setCurrentTopic] = useState('');
   const [showRoadmap,  setShowRoadmap]  = useState(false);
 
-  const handleSearch = async (topic) => {
+  const handleSearch = async (topic, forceRefresh = false) => {
     setShowRoadmap(false);
     setCurrentTopic(topic);
-    const data = await fetchLesson(topic);
+    const data = await fetchLesson(topic, forceRefresh);
     if (data?.lesson) {
       addEntry(topic, data.lesson);
       recordLesson(topic);
     }
   };
+
+  const handleRefresh = () => handleSearch(currentTopic, true);
 
   const completedIds = useMemo(() => matchHistoryToTopics(history), [history]);
   const totalTopics  = 57;
@@ -130,10 +132,8 @@ export default function App() {
           </button>
 
           <div className="flex items-center gap-2">
-            {/* Streak & XP badge */}
             <StreakBadge data={streakData} />
 
-            {/* Roadmap progress pill */}
             <button
               onClick={() => setShowRoadmap(true)}
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-900 border border-gray-700 hover:border-violet-600 hover:bg-violet-950/40 transition-all group"
@@ -202,6 +202,8 @@ export default function App() {
                 lesson={lesson}
                 webResults={webResults}
                 topic={currentTopic}
+                cacheInfo={cacheInfo}
+                onRefresh={handleRefresh}
                 onQuizComplete={recordQuizScore}
               />
             </motion.div>
@@ -209,10 +211,8 @@ export default function App() {
         </AnimatePresence>
       </div>
 
-      {/* Floating XP toast */}
       <XPToast toast={toast} />
 
-      {/* History sidebar */}
       <HistorySidebar
         history={history}
         onSelect={handleSearch}
@@ -221,7 +221,6 @@ export default function App() {
         currentTopic={currentTopic}
       />
 
-      {/* Roadmap overlay */}
       <AnimatePresence>
         {showRoadmap && (
           <RoadmapView

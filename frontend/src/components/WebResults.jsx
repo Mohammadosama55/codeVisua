@@ -1,16 +1,27 @@
 import { motion } from 'framer-motion';
-import { Globe, ExternalLink, Lightbulb } from 'lucide-react';
+import { Globe, ExternalLink, Lightbulb, Layers, Zap } from 'lucide-react';
 
 export default function WebResults({ webResults }) {
   if (!webResults) return null;
-  const { answer, sources } = webResults;
+  const { answer, sources, fromCache, cachedTopic } = webResults;
 
   return (
     <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
       <div className="px-5 py-3 border-b border-gray-800 flex items-center gap-2">
         <Globe className="w-4 h-4 text-blue-400" />
-        <span className="text-white font-semibold text-sm">Live Web Context</span>
-        <span className="ml-auto text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">Tavily Search</span>
+        <span className="text-white font-semibold text-sm">Web Context</span>
+        <div className="ml-auto flex items-center gap-2">
+          {fromCache ? (
+            <span className="flex items-center gap-1 text-xs bg-blue-950/60 text-blue-400 px-2 py-0.5 rounded-full border border-blue-800">
+              <Layers className="w-3 h-3" />
+              {cachedTopic ? `Cached: "${cachedTopic}"` : 'Cached'}
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 text-xs bg-green-950/60 text-green-400 px-2 py-0.5 rounded-full border border-green-800">
+              <Zap className="w-3 h-3" /> Live search
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="p-5 space-y-4">
